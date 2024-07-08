@@ -290,20 +290,22 @@ func (p *ResourcePortraitIndicatorPlugin) syncSPD(key string) error {
 		}
 		return err
 	}
-	bytes, err := json.MarshalIndent(spd, "", "\t")
+	bytes, err := json.MarshalIndent(&spd.Spec, "", "\t")
 
 	// fetch resource portrait config from spd
 	rpIndicator := &apiconfig.ResourcePortraitIndicators{}
-	_, err = util.GetSPDExtendedIndicators(spd, rpIndicator)
+	_, err2 := util.GetSPDExtendedIndicators(spd, rpIndicator)
+	bytes2, err := json.MarshalIndent(rpIndicator, "", "\t")
 
-	klog.InfoS("[tracing]", "rp", fmt.Sprintf("%+v", rpIndicator), "spd", string(bytes))
-	if err != nil {
+	klog.InfoS("[tracing]", "rp", string(bytes2), "spd-spec", string(bytes))
+	if err2 != nil {
 		klog.Errorf("[spd-resource-portrait] failed to get resource portrait configs from spd [%v] error: %v", key, err)
-		return err
+		return err2
 	} else if rpIndicator == nil || len(rpIndicator.Configs) == 0 {
+		klog.InfoS("[tracing]", "rpIndicator == nil", rpIndicator == nil, "len(rpIndicator.Configs) == 0", len(rpIndicator.Configs) == 0)
 		return nil
 	}
-
+	klog.InfoS("[tracing]", "refreshing")
 	// refresh portrait and write into spd
 	updated, aggMetrics := p.refreshPortrait(spd, rpIndicator)
 	if updated {
@@ -322,7 +324,7 @@ func (p *ResourcePortraitIndicatorPlugin) refreshPortrait(spd *apiworkload.Servi
 	if rpIndicator == nil || len(rpIndicator.Configs) == 0 {
 		return false, nil
 	}
-	klog.V(5).Infof("[spd-resource-portrait] refreshing spd %s/%s", spd.Namespace, spd.Name)
+	klog.Infof("[spd-resource-portrait] refreshing spd %s/%s", spd.Namespace, spd.Name)
 
 	// get the last refresh time of the portrait
 	aggMetrics = getAggMetricsFromSPD(spd)
