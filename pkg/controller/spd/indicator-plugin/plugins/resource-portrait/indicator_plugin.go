@@ -18,6 +18,7 @@ package resource_portrait
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -289,10 +290,13 @@ func (p *ResourcePortraitIndicatorPlugin) syncSPD(key string) error {
 		}
 		return err
 	}
+	bytes, err := json.MarshalIndent(spd, "", "\t")
 
 	// fetch resource portrait config from spd
 	rpIndicator := &apiconfig.ResourcePortraitIndicators{}
 	_, err = util.GetSPDExtendedIndicators(spd, rpIndicator)
+
+	klog.InfoS("[spd-resource-portrait]", "rp", fmt.Sprintf("%+v", rpIndicator), "spd", string(bytes))
 	if err != nil {
 		klog.Errorf("[spd-resource-portrait] failed to get resource portrait configs from spd [%v] error: %v", key, err)
 		return err
