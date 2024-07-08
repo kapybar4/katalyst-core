@@ -471,11 +471,14 @@ func GetExtendedIndicator(indicators interface{}) (string, runtime.Object, error
 
 func GetSPDExtendedIndicators(spd *apiworkload.ServiceProfileDescriptor, indicators interface{}) (*int32, error) {
 	name, o, err := GetExtendedIndicator(indicators)
+	klog.InfoS("[tracing]", "name", name, "err", err)
+	defer klog.InfoS("[tracing]", "indicators", fmt.Sprintf("%+v", indicators))
 	if err != nil {
 		return nil, err
 	}
 
 	for _, indicator := range spd.Spec.ExtendedIndicator {
+		klog.InfoS("[tracing]", "indicator.Name", indicator.Name, "name", name)
 		if indicator.Name != name {
 			continue
 		}

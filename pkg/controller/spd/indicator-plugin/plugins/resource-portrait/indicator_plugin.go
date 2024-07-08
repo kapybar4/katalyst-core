@@ -296,7 +296,7 @@ func (p *ResourcePortraitIndicatorPlugin) syncSPD(key string) error {
 	rpIndicator := &apiconfig.ResourcePortraitIndicators{}
 	_, err = util.GetSPDExtendedIndicators(spd, rpIndicator)
 
-	klog.InfoS("[spd-resource-portrait]", "rp", fmt.Sprintf("%+v", rpIndicator), "spd", string(bytes))
+	klog.InfoS("[tracing]", "rp", fmt.Sprintf("%+v", rpIndicator), "spd", string(bytes))
 	if err != nil {
 		klog.Errorf("[spd-resource-portrait] failed to get resource portrait configs from spd [%v] error: %v", key, err)
 		return err
